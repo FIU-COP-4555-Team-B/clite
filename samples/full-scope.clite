@@ -1,0 +1,36 @@
+int main() {
+  int count, limit, values[10]
+  bool enabled, finished
+  float ratio, total
+  char letter, digit, space
+
+  count = 0;
+  limit = 10;
+  enabled = true;
+  finished = false;
+  ratio = 2.50;
+  total = 0.0;
+  letter = 'A';
+  digit = '7';
+  space = ' ';
+  limit = values[0];
+
+  ;
+
+  while (count < limit && !finished) {
+    if (enabled || count == 0) {
+      total = total + float(values[count]) * ratio;
+    } else {
+      total = total - 1.0 / 2.0;
+    }
+
+    count = count + 1;
+    finished = count >= limit;
+  }
+
+  if (count != 0) count = -count;
+  if (count <= limit) enabled = bool(count);
+  if (ratio > 0.0) limit = int(ratio);
+  letter = char(65);
+  count = (limit + 3) % 2;
+}

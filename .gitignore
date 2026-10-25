@@ -1,6 +1,6 @@
-/obj/
-/lib/
-/alire/
-/config/
-
 **/*.pdf
+
+/node_modules/
+/dist/
+/coverage/
+*.tsbuildinfo
