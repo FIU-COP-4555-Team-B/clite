@@ -10,43 +10,43 @@ export interface Span {
 }
 
 export type TokenKind =
-  | 'int'
-  | 'bool'
-  | 'float'
-  | 'char'
-  | 'main'
-  | 'if'
-  | 'else'
-  | 'while'
-  | 'boolean'
-  | 'identifier'
-  | 'integer'
-  | 'float-literal'
-  | 'char-literal'
-  | '+'
-  | '-'
-  | '*'
-  | '/'
-  | '%'
-  | '!'
-  | '='
-  | '=='
-  | '!='
-  | '<'
-  | '<='
-  | '>'
-  | '>='
-  | '&&'
-  | '||'
-  | '('
-  | ')'
-  | '{'
-  | '}'
-  | '['
-  | ']'
-  | ','
-  | ';'
-  | 'eof';
+  | "int"
+  | "bool"
+  | "float"
+  | "char"
+  | "main"
+  | "if"
+  | "else"
+  | "while"
+  | "boolean"
+  | "identifier"
+  | "integer"
+  | "float-literal"
+  | "char-literal"
+  | "+"
+  | "-"
+  | "*"
+  | "/"
+  | "%"
+  | "!"
+  | "="
+  | "=="
+  | "!="
+  | "<"
+  | "<="
+  | ">"
+  | ">="
+  | "&&"
+  | "||"
+  | "("
+  | ")"
+  | "{"
+  | "}"
+  | "["
+  | "]"
+  | ","
+  | ";"
+  | "eof";
 
 export interface Token {
   readonly kind: TokenKind;
@@ -60,18 +60,18 @@ export interface Diagnostic {
 }
 
 export type LexerMode =
-  | 'start'
-  | 'identifier'
-  | 'integer'
-  | 'float'
-  | 'symbol'
-  | 'character-value'
-  | 'character-close'
-  | 'character-end'
-  | 'character-invalid'
-  | 'character-error'
-  | 'invalid'
-  | 'done';
+  | "start"
+  | "identifier"
+  | "integer"
+  | "float"
+  | "symbol"
+  | "character-value"
+  | "character-close"
+  | "character-end"
+  | "character-invalid"
+  | "character-error"
+  | "invalid"
+  | "done";
 
 export interface LexerState {
   readonly mode: LexerMode;
@@ -81,21 +81,21 @@ export interface LexerState {
 }
 
 export type Transition =
-  | { readonly kind: 'consume'; readonly span: Span; readonly message: string; }
+  | { readonly kind: "consume"; readonly span: Span; readonly message: string }
   | {
-      readonly kind: 'emit';
+      readonly kind: "emit";
       readonly span: Span;
       readonly message: string;
       readonly token: Token;
     }
   | {
-      readonly kind: 'error';
+      readonly kind: "error";
       readonly span: Span;
       readonly message: string;
       readonly diagnostic: Diagnostic;
     }
   | {
-      readonly kind: 'finish';
+      readonly kind: "finish";
       readonly span: Span;
       readonly message: string;
       readonly token: Token;

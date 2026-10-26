@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import type { Span, Token } from '../lexer/types';
+import { useEffect, useRef } from "react";
+import type { Span, Token } from "../lexer/types";
 
 interface TokenTableProps {
   tokens: readonly Token[];
@@ -7,11 +7,16 @@ interface TokenTableProps {
   onSelect: (span: Span) => void;
 }
 
-export function TokenTable({ tokens, selectedSpan, onSelect }: TokenTableProps) {
+export function TokenTable({
+  tokens,
+  selectedSpan,
+  onSelect,
+}: TokenTableProps) {
   const viewport = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (viewport.current) viewport.current.scrollTop = viewport.current.scrollHeight;
+    if (viewport.current)
+      viewport.current.scrollTop = viewport.current.scrollHeight;
   }, [tokens.length]);
 
   return (
@@ -22,18 +27,39 @@ export function TokenTable({ tokens, selectedSpan, onSelect }: TokenTableProps) 
       </div>
       <div className="token-scroll" ref={viewport}>
         <table>
-          <thead><tr><th scope="col">#</th><th scope="col">Kind</th><th scope="col">Lexeme</th><th scope="col">Span</th></tr></thead>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Kind</th>
+              <th scope="col">Lexeme</th>
+              <th scope="col">Span</th>
+            </tr>
+          </thead>
           <tbody>
             {tokens.map((token, index) => (
-              <tr key={`${token.span.start.offset}-${token.kind}`} className={selectedSpan === token.span ? 'selected-token' : undefined}>
+              <tr
+                key={`${token.span.start.offset}-${token.kind}`}
+                className={
+                  selectedSpan === token.span ? "selected-token" : undefined
+                }
+              >
                 <td>{index + 1}</td>
-                <td><span className="token-kind">{token.kind}</span></td>
                 <td>
-                  <button className="lexeme-button" onClick={() => onSelect(token.span)} aria-label={`Inspect token ${index + 1}: ${token.kind}`}>
+                  <span className="token-kind">{token.kind}</span>
+                </td>
+                <td>
+                  <button
+                    className="lexeme-button"
+                    onClick={() => onSelect(token.span)}
+                    aria-label={`Inspect token ${index + 1}: ${token.kind}`}
+                  >
                     <code>{JSON.stringify(token.lexeme)}</code>
                   </button>
                 </td>
-                <td className="span-cell">{token.span.start.line}:{token.span.start.column}–{token.span.end.line}:{token.span.end.column}</td>
+                <td className="span-cell">
+                  {token.span.start.line}:{token.span.start.column}–
+                  {token.span.end.line}:{token.span.end.column}
+                </td>
               </tr>
             ))}
           </tbody>

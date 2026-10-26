@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import type { Position, Span } from '../lexer/types';
+import { useEffect, useRef } from "react";
+import type { Position, Span } from "../lexer/types";
 
 interface SourceViewProps {
   source: string;
@@ -38,7 +38,9 @@ export function SourceView({ source, position, span }: SourceViewProps) {
         <code>
           {source.slice(0, start)}
           {start === end ? (
-            <span className="cursor" aria-label="Lexer cursor" ref={marker}>▏</span>
+            <span className="cursor" aria-label="Lexer cursor" ref={marker}>
+              ▏
+            </span>
           ) : (
             <mark ref={marker}>{source.slice(start, end)}</mark>
           )}
