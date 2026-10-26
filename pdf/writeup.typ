@@ -1,8 +1,8 @@
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 #let title = [Clite Lexer]
-#let class-code = [XXX 0000]
-#let authors = ("Gabriel Garcia", "Marcelo Hernandez", "Third Author")
+#let class-code = [COP 4555]
+#let authors = ("Gabriel Garcia", "Marcelo Hernandez", "Shirina Daniel")
 #let date = datetime.today()
 
 #set document(title: title, author: authors, date: date)
