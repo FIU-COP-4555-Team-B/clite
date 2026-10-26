@@ -190,12 +190,19 @@ token kinds; punctuation and operators are tokens as well.
 
 #pagebreak()
 
-= Source code archive
+= Lexer source code
 
-The complete TypeScript lexer and GUI source code, tests, sample inputs, and
-project configuration are included in the accompanying `clite-source.zip`
-archive. The archive includes the files needed to install dependencies, run
-the project, and execute its tests.
+This appendix includes the lexer implementation and the type definitions it
+uses.
+
+#set text(size: 7pt)
+== `lexer.ts`
+#raw(read("../src/lexer/lexer.ts"), block: true)
+
+#pagebreak()
+
+== `types.ts`
+#raw(read("../src/lexer/types.ts"), block: true)
 
 #pagebreak()
 
@@ -205,6 +212,7 @@ The project GUI provides source editing and sample selection, step/playback
 controls, lexer-state display, source highlighting, and a token table with
 token kinds and lexemes.
 
+#set text(size: 10pt)
 #figure(
   image("images/gui-step.png", width: 100%),
   caption: [The Clite lexer GUI after processing `full-scope.clite`.],
