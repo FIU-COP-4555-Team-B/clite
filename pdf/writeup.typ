@@ -1,7 +1,7 @@
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 #let title = [Clite Lexer]
-#let class-code = [COP 4555]
+#let class-code = [COP 4555: Principles of Programming Languages]
 #let authors = ("Gabriel Garcia", "Marcelo Hernandez", "Shirina Daniel")
 #let date = datetime.today()
 
