@@ -17,6 +17,11 @@
   date.display("[month repr:long] [day padding:none], [year]"),
 ))
 
+#align(center, text(size: 16pt, weight: "bold")[Contents])
+#outline(title: none, depth: 2)
+
+#pagebreak()
+
 = Lexer
 
 The lexer is a state machine. Its state holds a mode, a position, and the partial lexeme.
@@ -143,25 +148,71 @@ Each call to `step` reads the next character, the lookahead, and does one of the
   ],
 )
 
-// To add screenshots, save each one as a PNG file in `pdf/images/`.
-// Then remove one `//` from the start of each line below.
+#pagebreak()
 
-// = Screenshots
-//
-// #figure(
-//   image("images/gui-step.png", width: 100%),
-//   caption: [The GUI after the lexer emits the `int` token.],
-// ) <gui-step>
-//
-// @gui-step shows the source, the token table, and the lexer state.
-//
-// // Put two screenshots side by side in a grid.
-// #figure(
-//   grid(
-//     columns: 2,
-//     gutter: 1em,
-//     image("images/gui-light.png"),
-//     image("images/gui-dark.png"),
-//   ),
-//   caption: [The GUI in light mode (left) and dark mode (right).],
-// )
+= Sample input
+
+The following is the `full-scope.clite` sample used to exercise the lexer.
+It includes declarations, arrays, literals, operators, delimiters, and control
+flow. The sample is read from the project file when this document is compiled.
+
+#set text(size: 8pt)
+#raw(read("../samples/full-scope.clite"), block: true)
+
+#pagebreak()
+
+= Symbol table sample
+
+This excerpt shows the token kind and original lexeme produced for representative
+parts of the sample input. Keywords and boolean literals receive their reserved
+token kinds; punctuation and operators are tokens as well.
+
+#table(
+  columns: (0.7fr, 1.5fr, 1.2fr),
+  [*No.*], [*Token kind*], [*Lexeme*],
+  [1], [int], [`int`],
+  [2], [main], [`main`],
+  [3], [`(`], [`(`],
+  [4], [`{`], [`{`],
+  [5], [identifier], [`count`],
+  [6], [`[`], [`[`],
+  [7], [integer], [`10`],
+  [8], [boolean], [`true`],
+  [9], [float-literal], [`2.50`],
+  [10], [char-literal], [`'A'`],
+  [11], [while], [`while`],
+  [12], [`<`], [`<`],
+  [13], [`&&`], [`&&`],
+  [14], [`==`], [`==`],
+  [15], [`+`], [`+`],
+  [16], [eof], [empty string],
+)
+
+#pagebreak()
+
+= Lexer source code
+
+The lexer is implemented in TypeScript. The complete implementation and its
+type definitions are included below from the project source files.
+
+#set text(size: 7pt)
+== `lexer.ts`
+#raw(read("../src/lexer/lexer.ts"), block: true)
+
+#pagebreak()
+
+== `types.ts`
+#raw(read("../src/lexer/types.ts"), block: true)
+
+#pagebreak()
+
+= Lexer output screenshot
+
+The project GUI provides source editing and sample selection, step/playback
+controls, lexer-state display, source highlighting, and a token table with
+token kinds and lexemes.
+
+#figure(
+  image("images/gui-step.png", width: 100%),
+  caption: [The Clite lexer GUI after processing `full-scope.clite`.],
+)
