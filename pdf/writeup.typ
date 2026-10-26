@@ -190,19 +190,12 @@ token kinds; punctuation and operators are tokens as well.
 
 #pagebreak()
 
-= Lexer source code
+= Source code archive
 
-The lexer is implemented in TypeScript. The complete implementation and its
-type definitions are included below from the project source files.
-
-#set text(size: 7pt)
-== `lexer.ts`
-#raw(read("../src/lexer/lexer.ts"), block: true)
-
-#pagebreak()
-
-== `types.ts`
-#raw(read("../src/lexer/types.ts"), block: true)
+The complete TypeScript lexer and GUI source code, tests, sample inputs, and
+project configuration are included in the accompanying `clite-source.zip`
+archive. The archive includes the files needed to install dependencies, run
+the project, and execute its tests.
 
 #pagebreak()
 
