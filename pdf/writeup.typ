@@ -11,7 +11,7 @@
 #bnf(
   Prod([Program], [int main() { Declarations Statements }]),
   Prod([Declarations], Star([Declaration])),
-  Prod([Declaration], [Type Identifier #Opt([[Integer]]) #Star([, Identifier#Opt([[Integer]])])]),
+  Prod([Declaration], [Type Identifier #Opt([[Integer]]) #Star([, Identifier#Opt([[Integer]])])\;]),
   Prod([Type], [Integer], [Boolean], [Float], [Char]),
   Prod([Statements], Star([Statement])),
   Prod([Statement], [;], [Block], [Assignment], [If Statement], [While Statement]),
@@ -29,7 +29,7 @@
   Prod([MulOp], [\*], [/], [%]),
   Prod([Factor], [#Opt([UnaryOp]) Primary]),
   Prod([UnaryOp], [-], [!]),
-  Prod([Primary], [Identifier #Opt([[Expression]])], [Literal (Expression)], [Type (Expression)]),
+  Prod([Primary], [Identifier #Opt([[Expression]])], [Literal], [(Expression)], [Type (Expression)]),
   Prod([Identifier], [Letter #Star([Letter], [Digit])]),
   Prod([Letter], [a-z], [A-Z]),
   Prod([Digit], [0-9]),

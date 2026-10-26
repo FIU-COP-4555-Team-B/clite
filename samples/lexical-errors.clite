@@ -1,0 +1,10 @@
+int main() {
+  int count;
+  char letter;
+
+  count = 1.;
+  count = _count + 1;
+  if (true & false) count = 0;
+  if (true | false) count = 1;
+  letter = 'ab';
+}

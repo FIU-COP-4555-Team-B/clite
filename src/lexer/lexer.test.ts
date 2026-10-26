@@ -157,6 +157,23 @@ describe('token categories', () => {
     expect(tokenize(spellings.join(' ')).diagnostics).toEqual([]);
   });
 
+  it.each([
+    ['42', [['integer', '42']]],
+    ['true', [['boolean', 'true']]],
+    ['2.50', [['float-literal', '2.50']]],
+    ['\'A\'', [['char-literal', '\'A\'']]],
+    ['count', [['identifier', 'count']]],
+    ['values[count]', [['identifier', 'values'], ['[', '['], ['identifier', 'count'], [']', ']']]],
+    ['(count + 1)', [['(', '('], ['identifier', 'count'], ['+', '+'], ['integer', '1'], [')', ')']]],
+    ['float(count)', [['float', 'float'], ['(', '('], ['identifier', 'count'], [')', ')']]],
+  ] satisfies [string, [TokenKind, string][]][])('tokenizes the independent Primary alternative %s', (source, expected) => {
+    const result = trace(source);
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.tokens.map(({ kind, lexeme }) => [kind, lexeme])).toEqual([...expected, ['eof', '']]);
+    expect({ tokens: result.tokens, diagnostics: result.diagnostics }).toEqual(tokenize(source));
+  });
+
   it('does not treat comment-like text or escapes as special syntax', () => {
     expect(compact('// hi /* x */')).toEqual([
       ['/', '/'], ['/', '/'], ['identifier', 'hi'], ['/', '/'], ['*', '*'],

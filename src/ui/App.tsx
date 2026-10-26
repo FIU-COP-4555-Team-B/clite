@@ -1,10 +1,19 @@
-import { useEffect, useReducer, useRef, useState } from 'react';
-import sample from '../../samples/full-scope.clite?raw';
+import { useEffect, useReducer, useState } from 'react';
 import { createLexerState, step } from '../lexer/lexer';
 import type { Diagnostic, LexerState as State, Span, Token, Transition } from '../lexer/types';
 import { LexerState } from './LexerState';
 import { SourceView } from './SourceView';
 import { TokenTable } from './TokenTable';
+
+const samples = Object.entries(import.meta.glob<string>('../../samples/**/*.clite', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}))
+  .map(([path, source]) => ({ name: path.slice('../../samples/'.length), source }))
+  .sort((left, right) => left.name.localeCompare(right.name));
+
+const initialSource = samples.find((sample) => sample.name === 'full-scope.clite')?.source ?? samples[0]?.source ?? '';
 
 interface Session {
   source: string;
@@ -23,6 +32,8 @@ type Action =
   | { type: 'step' }
   | { type: 'play' }
   | { type: 'pause' };
+
+type SourceTab = 'edit' | 'preview';
 
 function createSession(source: string): Session {
   return {
@@ -68,11 +79,10 @@ function reduceSession(session: Session, action: Action): Session {
 }
 
 export function App() {
-  const [session, dispatch] = useReducer(reduceSession, sample, createSession);
-  const [delay, setDelay] = useState(60);
+  const [session, dispatch] = useReducer(reduceSession, initialSource, createSession);
+  const [speed, setSpeed] = useState<1 | 2 | 4>(1);
+  const [sourceTab, setSourceTab] = useState<SourceTab>('edit');
   const [selectedSpan, setSelectedSpan] = useState<Span | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
-  const fileRevision = useRef(0);
 
   useEffect(() => {
     if (!session.running) return;
@@ -80,31 +90,21 @@ export function App() {
     const timer = window.setInterval(() => {
       setSelectedSpan(null);
       dispatch({ type: 'step' });
-    }, delay);
+    }, 200 / speed);
 
     return () => window.clearInterval(timer);
-  }, [session.running, delay]);
+  }, [session.running, speed]);
 
   function replaceSource(source: string) {
-    fileRevision.current += 1;
     setSelectedSpan(null);
-    setFileError(null);
+    setSourceTab('edit');
     dispatch({ type: 'source', source });
   }
 
-  async function loadFile(file: File) {
-    const revision = ++fileRevision.current;
-
+  function inspectSpan(span: Span) {
     dispatch({ type: 'pause' });
-    setFileError(null);
-
-    try {
-      const source = await file.text();
-
-      if (revision === fileRevision.current) replaceSource(source);
-    } catch {
-      if (revision === fileRevision.current) setFileError('Could not read this file. Try another local text file.');
-    }
+    setSelectedSpan(span);
+    setSourceTab('preview');
   }
 
   const status = session.complete ? 'Complete' : session.running ? 'Running' : session.steps > 0 ? 'Paused' : 'Ready';
@@ -112,91 +112,85 @@ export function App() {
 
   return (
     <main className="app-shell">
-      <header className="masthead">
-        <div>
-          <p className="eyebrow">Clite / lexical analysis</p>
-          <h1>Every character.<br /><em>One transition at a time.</em></h1>
-          <p className="intro">Follow source code as it becomes a stream of tokens. No parser, no hidden steps.</p>
-        </div>
-        <span className={`status-badge ${session.complete ? 'is-complete' : ''}`} data-testid="playback-status">{status}</span>
-      </header>
-
-      <section className="toolbar" aria-label="Lexer controls">
+      <header className="app-header" aria-label="Lexer controls">
+        <h1>Clite</h1>
         <div className="playback-controls">
           <button className="primary" disabled={session.complete || session.running} onClick={() => {
             setSelectedSpan(null);
+            setSourceTab('preview');
             dispatch({ type: 'step' });
           }}>Step →</button>
-          <button disabled={session.complete} onClick={() => dispatch({ type: session.running ? 'pause' : 'play' })}>{session.running ? 'Pause' : 'Run'}</button>
+          <button disabled={session.complete} onClick={() => {
+            if (!session.running) setSourceTab('preview');
+            dispatch({ type: session.running ? 'pause' : 'play' });
+          }}>{session.running ? 'Pause' : 'Run'}</button>
+          <button className="speed-button" title="simulation speed" aria-label={`Simulation speed: ${speed}x`} onClick={() => {
+            setSpeed((current) => current === 1 ? 2 : current === 2 ? 4 : 1);
+          }}>{speed}x</button>
           <button onClick={() => {
-            fileRevision.current += 1;
             setSelectedSpan(null);
             dispatch({ type: 'reset' });
           }}>Reset</button>
         </div>
-        <label className="speed-control">Playback
-          <select value={delay} onChange={(event) => setDelay(Number(event.target.value))}>
-            <option value={200}>Slow · 5 steps/s</option>
-            <option value={60}>Normal · 17 steps/s</option>
-            <option value={10}>Fast · 100 steps/s</option>
-          </select>
-        </label>
-      </section>
+        <span className="status-badge" data-testid="playback-status">{status}</span>
+      </header>
 
       <div className="workspace">
-        <div className="source-column">
-          <section className="panel editor-panel" aria-labelledby="source-heading">
-            <div className="panel-heading">
-              <h2 id="source-heading">Source input</h2>
-              <div className="source-actions">
-                <button onClick={() => replaceSource(sample)}>Load example</button>
-                <label className="file-button">Open file
-                  <input type="file" accept=".clite,.txt,text/plain" aria-label="Open source file" onChange={(event) => {
-                    const file = event.target.files?.[0];
+        <section className="panel source-panel" aria-labelledby="source-heading">
+          <div className="panel-heading">
+            <h2 id="source-heading">Source</h2>
+            <div className="source-actions">
+              <select aria-label="Load sample" value="" disabled={samples.length === 0} onChange={(event) => {
+                const sample = samples.find((sample) => sample.name === event.target.value);
 
-                    if (file) void loadFile(file);
-                    event.target.value = '';
-                  }} />
-                </label>
-              </div>
+                if (sample) replaceSource(sample.source);
+              }}>
+                <option value="" disabled>Load sample</option>
+                {samples.map((sample) => <option key={sample.name} value={sample.name}>{sample.name}</option>)}
+              </select>
             </div>
+          </div>
+          <div className="source-tabs" role="tablist" aria-label="Source view" onKeyDown={(event) => {
+            const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+
+            if (!keys.includes(event.key)) return;
+
+            event.preventDefault();
+
+            const index = event.key === 'Home' ? 0 : event.key === 'End' ? 1 : sourceTab === 'edit' ? 1 : 0;
+            const tabs = event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+
+            setSourceTab(index === 0 ? 'edit' : 'preview');
+            tabs[index]?.focus();
+          }}>
+            <button id="edit-tab" role="tab" aria-selected={sourceTab === 'edit'} aria-controls="edit-panel" tabIndex={sourceTab === 'edit' ? 0 : -1} onClick={() => setSourceTab('edit')}>Edit</button>
+            <button id="preview-tab" role="tab" aria-selected={sourceTab === 'preview'} aria-controls="preview-panel" tabIndex={sourceTab === 'preview' ? 0 : -1} onClick={() => setSourceTab('preview')}>Preview</button>
+          </div>
+          <div id="edit-panel" className="source-tab-panel" role="tabpanel" aria-labelledby="edit-tab" hidden={sourceTab !== 'edit'}>
             <label className="sr-only" htmlFor="source-input">Source code</label>
-            <textarea id="source-input" value={session.source} spellCheck={false} autoCapitalize="off" autoCorrect="off" onChange={(event) => replaceSource(event.target.value)} aria-describedby="editor-hint" />
-            <p className="panel-note" id="editor-hint">Editing starts a new execution. The example follows the documented grammar assumptions.</p>
-            {fileError && <p className="file-error" role="alert">{fileError}</p>}
-          </section>
+            <textarea id="source-input" value={session.source} spellCheck={false} autoCapitalize="off" autoCorrect="off" onChange={(event) => replaceSource(event.target.value)} />
+          </div>
+          <div id="preview-panel" className="source-tab-panel" role="tabpanel" aria-labelledby="preview-tab" hidden={sourceTab !== 'preview'}>
+            {sourceTab === 'preview' && <SourceView source={session.source} position={session.lexer.position} span={highlightedSpan} />}
+          </div>
+        </section>
 
-          <section className="panel trace-panel">
-            <SourceView source={session.source} position={session.lexer.position} span={highlightedSpan} />
-          </section>
-        </div>
-
-        <div className="output-column">
-          <LexerState state={session.lexer} event={session.event} source={session.source} steps={session.steps} />
-          <TokenTable tokens={session.tokens} selectedSpan={selectedSpan} onSelect={(span) => {
-            dispatch({ type: 'pause' });
-            setSelectedSpan(span);
-          }} />
-          <section className="panel diagnostics-panel" aria-labelledby="diagnostics-heading">
-            <div className="panel-heading"><h2 id="diagnostics-heading">Diagnostics</h2><span>{session.diagnostics.length} {session.diagnostics.length === 1 ? 'error' : 'errors'}</span></div>
-            {session.diagnostics.length === 0 ? <p className="empty-state">{session.complete ? 'No lexical errors.' : 'No lexical errors so far.'}</p> : (
-              <ul aria-live="polite">
-                {session.diagnostics.map((diagnostic, index) => (
-                  <li key={index}>
-                    <button className="diagnostic-link" onClick={() => {
-                      dispatch({ type: 'pause' });
-                      setSelectedSpan(diagnostic.span);
-                    }}>{diagnostic.span.start.line}:{diagnostic.span.start.column}</button>
-                    <span>{diagnostic.message}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </div>
+        <LexerState state={session.lexer} event={session.event} source={session.source} steps={session.steps} />
+        <TokenTable tokens={session.tokens} selectedSpan={selectedSpan} onSelect={inspectSpan} />
+        <section className="panel diagnostics-panel" aria-labelledby="diagnostics-heading">
+          <div className="panel-heading"><h2 id="diagnostics-heading">Diagnostics</h2><span>{session.diagnostics.length} {session.diagnostics.length === 1 ? 'error' : 'errors'}</span></div>
+          {session.diagnostics.length === 0 ? <p className="empty-state">None</p> : (
+            <ul aria-live="polite">
+              {session.diagnostics.map((diagnostic, index) => (
+                <li key={index}>
+                  <button className="diagnostic-link" onClick={() => inspectSpan(diagnostic.span)}>{diagnostic.span.start.line}:{diagnostic.span.start.column}</button>
+                  <span>{diagnostic.message}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
-
-      <footer>Strict Clite · ASCII identifiers & characters · No comments or escapes · All processing stays in your browser</footer>
     </main>
   );
 }

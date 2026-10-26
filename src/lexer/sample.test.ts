@@ -1,8 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import sample from '../../samples/full-scope.clite?raw';
+import errorSample from '../../samples/lexical-errors.clite?raw';
 import expected from '../../samples/full-scope.tokens.json';
 import { createLexerState, step, tokenize } from './lexer';
 import type { Token } from './types';
+
+describe('lexical-errors sample', () => {
+  it('reports each invalid lexeme and recovers through EOF', () => {
+    const result = tokenize(errorSample);
+
+    expect(result.diagnostics.map(({ span }) => errorSample.slice(span.start.offset, span.end.offset))).toEqual([
+      '.', '_', '&', '|', '\'ab\'',
+    ]);
+    expect(result.tokens.at(-2)?.kind).toBe('}');
+    expect(result.tokens.at(-1)?.kind).toBe('eof');
+  });
+});
 
 describe('full-scope sample', () => {
   it('matches the hand-authored token sequence without diagnostics', () => {

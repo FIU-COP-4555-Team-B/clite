@@ -1,9 +1,9 @@
 [
   ["int", "int"], ["main", "main"], ["(", "("], [")", ")"], ["{", "{"],
-  ["int", "int"], ["identifier", "count"], [",", ","], ["identifier", "limit"], [",", ","], ["identifier", "values"], ["[", "["], ["integer", "10"], ["]", "]"],
-  ["bool", "bool"], ["identifier", "enabled"], [",", ","], ["identifier", "finished"],
-  ["float", "float"], ["identifier", "ratio"], [",", ","], ["identifier", "total"],
-  ["char", "char"], ["identifier", "letter"], [",", ","], ["identifier", "digit"], [",", ","], ["identifier", "space"],
+  ["int", "int"], ["identifier", "count"], [",", ","], ["identifier", "limit"], [",", ","], ["identifier", "values"], ["[", "["], ["integer", "10"], ["]", "]"], [";", ";"],
+  ["bool", "bool"], ["identifier", "enabled"], [",", ","], ["identifier", "finished"], [";", ";"],
+  ["float", "float"], ["identifier", "ratio"], [",", ","], ["identifier", "total"], [";", ";"],
+  ["char", "char"], ["identifier", "letter"], [",", ","], ["identifier", "digit"], [",", ","], ["identifier", "space"], [";", ";"],
   ["identifier", "count"], ["=", "="], ["integer", "0"], [";", ";"],
   ["identifier", "limit"], ["=", "="], ["integer", "10"], [";", ";"],
   ["identifier", "enabled"], ["=", "="], ["boolean", "true"], [";", ";"],

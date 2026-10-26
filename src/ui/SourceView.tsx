@@ -34,10 +34,6 @@ export function SourceView({ source, position, span }: SourceViewProps) {
 
   return (
     <div className="source-view">
-      <div className="panel-heading">
-        <h2>Source trace</h2>
-        <span>Highlighted: latest transition or selected token</span>
-      </div>
       <pre aria-label="Source trace" tabIndex={0} ref={viewport}>
         <code>
           {source.slice(0, start)}

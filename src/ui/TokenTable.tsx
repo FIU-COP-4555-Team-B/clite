@@ -38,7 +38,7 @@ export function TokenTable({ tokens, selectedSpan, onSelect }: TokenTableProps) 
             ))}
           </tbody>
         </table>
-        {tokens.length === 0 && <p className="empty-state">Tokens appear here as the lexer recognizes them.</p>}
+        {tokens.length === 0 && <p className="empty-state">No tokens</p>}
       </div>
     </section>
   );

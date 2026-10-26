@@ -24,7 +24,7 @@ export function LexerState({ state, event, source, steps }: LexerStateProps) {
       </dl>
       <div className="transition" role="status" aria-live="polite">
         <span className="event-kind">{event?.kind ?? 'ready'}</span>
-        <p>{event?.message ?? 'Step to consume the first character. A transition may consume, emit, report an error, or finish.'}</p>
+        <p>{event?.message ?? '—'}</p>
       </div>
     </section>
   );
